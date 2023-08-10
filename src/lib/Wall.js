@@ -10,6 +10,7 @@ export default class Wall {
     world.createCollider(
       RAPIER.ColliderDesc.cuboid(w/2, h/2)
       .setTranslation(x, y)
+      .setRestitution(1)
     );
   }
   draw(sk){

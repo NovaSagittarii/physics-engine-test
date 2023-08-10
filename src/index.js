@@ -119,11 +119,15 @@ let gameLoop = () => {
   // attract ball towards the sensors
   if(sensors.length > 0){
     const sensor = sensors[0];
-    const F = 1;
-    const theta = Math.atan2(sensor.getY() - ball.getY(), sensor.getX() - ball.getX());
-    ball.rigidBody.applyImpulse(new RAPIER.Vector2(F*Math.cos(theta), F*Math.sin(theta)), true);
+    const J = 1;
+    const { x, y } = ball.getTranslation();
+    const theta = Math.atan2(sensor.getY() - y, sensor.getX() - x);
+    ball.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(theta), J*Math.sin(theta)), true);
   }else{
-
+    const { x, y } = ball.getVelocity();
+    const J = -Math.hypot(x, y) * ball.rigidBody.mass();
+    const theta = Math.atan2(y, x);
+    ball.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(theta), J*Math.sin(theta)), true);
   }
 
   world.step(eventQueue);

@@ -4,10 +4,11 @@ export default class Ball {
   constructor(world, x, y, radius){
     const rigidBodyDesc = this.rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
     .setTranslation(x, y)
-    .setLinearDamping(1.0)
+    .setLinearDamping(0)
     // .setCcdEnabled(true);
     const rigidBody = this.rigidBody = world.createRigidBody(rigidBodyDesc);
-    const colliderDesc = this.colliderDesc = RAPIER.ColliderDesc.ball(radius);
+    const colliderDesc = this.colliderDesc = RAPIER.ColliderDesc.ball(radius)
+      .setRestitution(1.0);
     this.collider = world.createCollider(colliderDesc, rigidBody);
   }
   draw(sk){
@@ -20,10 +21,10 @@ export default class Ball {
     sk.ellipse(0, 0, 1, 1);
     sk.pop();
   }
-  getX(){
-    return this.rigidBody.translation().x;
+  getTranslation(){
+    return this.rigidBody.translation();
   }
-  getY(){
-    return this.rigidBody.translation().y;
+  getVelocity(){
+    return this.rigidBody.linvel();
   }
 }
