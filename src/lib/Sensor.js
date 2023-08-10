@@ -2,6 +2,7 @@ import RAPIER from '@dimforge/rapier2d-compat';
 
 export default class Sensor {
   constructor(world, x, y, radius, callback){
+    this.attachments = [];
     this.world = world;
     this.x = x;
     this.y = y;
@@ -16,6 +17,8 @@ export default class Sensor {
     // world.intersectionsWith(this.collider, callback);
   }
   setTranslation(x, y){
+    this.x = x;
+    this.y = y;
     this.collider.setTranslation(x, y);
   }
   draw(sk){
@@ -26,6 +29,11 @@ export default class Sensor {
     sk.ellipse(x, y, radius*2, radius*2);
   }
   dispose(){
+    for(const dictionary of this.attachments) delete dictionary[this.collider.handle];
     this.world.removeCollider(this.collider);
+  }
+  attachCollider(dictionary){
+    dictionary[this.collider.handle] = this;
+    this.attachments.push(dictionary);
   }
 }

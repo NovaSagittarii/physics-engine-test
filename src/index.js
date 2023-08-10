@@ -2,7 +2,8 @@ import RAPIER from '@dimforge/rapier2d-compat';
 import * as p5 from 'p5';
 import PerformanceIndictor from './PerformanceIndicator';
 
-import { Ball, Wall, Sensor } from './lib';
+import { Ball, Wall, Sensor, Ping } from './lib';
+import { filter } from './lib/util';
 
 const performanceDiv = document.querySelector('#performance');
 const ballCountDiv = document.createElement('div'); performanceDiv.append(ballCountDiv);
@@ -10,6 +11,8 @@ const physicsPerformance = new PerformanceIndictor(performanceDiv, 'physics', 10
 const renderPerformance = new PerformanceIndictor(performanceDiv, 'render', 100);
 
 await RAPIER.init();
+let eventQueue = new RAPIER.EventQueue(true);
+const activeColliders = {};
 
 let gravity = { x: 0.0, y: -9.81*0 };
 let world = new RAPIER.World(gravity);
@@ -38,6 +41,7 @@ let ball = new Ball(world, 0, 1, 0.5);
 let balls = [...new Array(0)].map((_, i, {length}) => {
   return new Ball(world, ((i%11)-5)*1 +0.1, 0.2*i+5, i/length*0+0.2);
 });
+const pings = [];
 
 const sensors = [];
 // console.log(balls);
@@ -55,9 +59,11 @@ const P5 = new p5((sk) => {
   sk.mousePressed = () => {
     // console.log(rigidBody);
     // ball.rigidBody.applyImpulse(new RAPIER.Vector2(mouseclickpush *= -1, -5), true);
-    sensors.push(new Sensor(world, screenX, screenY, 1, (other) => {
+    const sensor = new Sensor(world, screenX, screenY, 1, (other) => {
       console.log(other);
-    }))
+    });
+    sensor.attachCollider(activeColliders);
+    sensors.push(sensor);
   };
   sk.draw = () => {
     if(!mutex) return;
@@ -84,6 +90,11 @@ const P5 = new p5((sk) => {
     for(const ball of balls) ball.draw(sk);
     for(const wall of walls) wall.draw(sk);
     for(const sensor of sensors) sensor.draw(sk);
+    for(const ping of pings){
+      ping.draw(sk);
+      ping.step();
+    }
+    filter(pings, (x) => x.alive);
 
     // drawRect(groundColliderDesc, {});
     sk.pop();
@@ -104,7 +115,24 @@ let gameLoop = () => {
   }
 
   const currentTime = performance.now();
-  world.step();
+  world.step(eventQueue);
+  eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+    // console.log(handle1, handle2, started);
+    if(started){
+      for(const h of [handle1, handle2]){
+        // console.log(h, h in activeColliders, activeColliders[h]);
+        if(activeColliders[h]){
+          const o = activeColliders[h];
+          pings.push(new Ping(o.x, o.y, 1, 30));
+        }
+      }
+    }
+  });
+  eventQueue.drainContactForceEvents(event => {
+    let handle1 = event.collider1(); // Handle of the first collider involved in the event.
+    let handle2 = event.collider2(); // Handle of the second collider involved in the event.
+    /* Handle the contact force event. */
+  });
 
   mutex = true;
   // Get and print the rigid-body's position.
