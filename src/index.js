@@ -4,6 +4,7 @@ import PerformanceIndictor from './PerformanceIndicator';
 
 import { Ball, Wall, Sensor, Ping } from './lib';
 import { angleDifference, filter } from './lib/util';
+import PingRay from './lib/PingRay';
 
 const performanceDiv = document.querySelector('#performance');
 const ballCountDiv = document.createElement('div'); performanceDiv.append(ballCountDiv);
@@ -54,6 +55,7 @@ const P5 = new p5((sk) => {
   sk.setup = () => {
     sk.createCanvas(400, 400);
     sk.frameRate(60);
+    sk.angleMode(sk.RADIANS);
     // console.log(sk);
   };
   sk.mousePressed = () => {
@@ -95,7 +97,22 @@ const P5 = new p5((sk) => {
     sk.noStroke();
     sk.fill('#000000');
     ball.draw(sk);
-    for(const ball of balls) ball.draw(sk);
+    for(const ball of balls){
+      ball.draw(sk);
+      // test raycast
+      let {x, y} = ball.getTranslation();
+      const theta = ball.rigidBody.rotation();
+      x += Math.cos(theta) * ball.radius *1.2;
+      y += Math.sin(theta) * ball.radius *1.2;
+      const ray = new RAPIER.Ray({ x, y }, { x: Math.cos(theta), y: Math.sin(theta) });
+      const maxToi = 100.0;
+      const solid = true;
+      const hit = world.castRay(ray, maxToi, solid);
+      if(hit !== null){
+        let hitPoint = ray.pointAt(hit.toi);
+        pings.push(new PingRay(x, y, hitPoint.x, hitPoint.y, 1));
+      }
+    }
     for(const wall of walls) wall.draw(sk);
     for(const sensor of sensors) sensor.draw(sk);
     for(const ping of pings){
@@ -117,8 +134,8 @@ let ii = 0;
 let gameLoop = () => {
   if(!mutex) return;
   mutex = false;
-  if(physicsPerformance.read() < 16 && balls.length < 10){
-    balls.push(new Ball(world, (((ii ++)%21)-10)*0.2, 20, 0.5 ));
+  if(physicsPerformance.read() < 16 && balls.length < 25){
+    balls.push(new Ball(world, (((ii ++)%21)-10)*0.2, 20 +(ii%5)*0.1, 0.5 ));
     ballCountDiv.innerText = ii;
   }
 

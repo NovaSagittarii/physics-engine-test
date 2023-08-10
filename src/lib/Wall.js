@@ -18,6 +18,7 @@ export default class Wall {
     sk.push();
     sk.translate(x, y);
     sk.scale(w, h);
+    sk.fill(0);
     sk.rect(0, 0, 1, 1);
     sk.pop();
   }

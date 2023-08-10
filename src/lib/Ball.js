@@ -6,7 +6,8 @@ export default class Ball {
     this.radius = radius;
     const rigidBodyDesc = this.rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
     .setTranslation(x, y)
-    .setLinearDamping(0)
+    // .setLinearDamping(1.0)
+    // .setAngularDamping(1.0)
     // .setCcdEnabled(true);
     const rigidBody = this.rigidBody = world.createRigidBody(rigidBodyDesc);
     const colliderDesc = this.colliderDesc = RAPIER.ColliderDesc.ball(radius, radius)
@@ -18,9 +19,10 @@ export default class Ball {
     const { x = 0, y = 0 } = (this.rigidBody?.translation && this.rigidBody.translation()) || {};
     const w = this.radius*2;
     const h = this.radius*2;
+    const theta = this.rigidBody.rotation();
     sk.push();
     sk.translate(x, y);
-    sk.rotate(this.rigidBody.rotation());
+    sk.rotate(theta);
 
     sk.stroke(255,0,0);
     sk.strokeWeight(0.1);
@@ -28,6 +30,7 @@ export default class Ball {
 
     sk.scale(w, h);
     sk.noStroke();
+    sk.fill(0);
     sk.ellipse(0, 0, 1, 1);
     sk.pop();
   }
