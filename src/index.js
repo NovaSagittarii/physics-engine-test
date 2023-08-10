@@ -3,6 +3,7 @@ import * as p5 from 'p5';
 import PerformanceIndictor from './PerformanceIndicator';
 
 import Ball from './lib/Ball';
+import Wall from './lib/Wall';
 
 const performanceDiv = document.querySelector('#performance');
 const ballCountDiv = document.createElement('div'); performanceDiv.append(ballCountDiv);
@@ -19,7 +20,7 @@ let world = new RAPIER.World(gravity);
 // world.createCollider(groundColliderDesc);
 
 // ground
-let rects = [
+let walls = [
   // {x: 0, y: -5, w: 20, h: 10}, // inner container
   // {x: -10, y: 5, w: 1, h: 10},
   // {x: 10, y: 5, w: 1, h: 10},
@@ -30,11 +31,7 @@ let rects = [
   {x: 0, y: 35, w: 100, h: 1}, // lid
 ].map(a => {
   const {x, y, w, h} = a;
-  world.createCollider(
-    RAPIER.ColliderDesc.cuboid(w/2, h/2)
-    .setTranslation(x, y)
-  );
-  return a;
+  return new Wall(world, x, y, w, h);
 });
 
 // ball is controllable, balls are environment
@@ -78,28 +75,9 @@ const P5 = new p5((sk) => {
     sk.rectMode(CENTER, CENTER);
     sk.noStroke();
     sk.fill('#000000');
-    const drawRect = function(collider, body){
-      const { x = 0, y = 0 } = (body?.translation && body.translation()) || {};
-      const w = collider.shape.radius*2;
-      const h = collider.shape.radius*2;
-      sk.push();
-      sk.translate(x, y);
-      sk.scale(w, h);
-      sk.ellipse(0, 0, 1, 1);
-      sk.pop();
-    };
-    // sk.rect(rigidBody.translation().x, rigidBody.translation().y, colliderDesc.shape(), 1);
-    
     ball.draw(sk);
     for(const ball of balls) ball.draw(sk);
-    
-    for(const {x, y, w, h} of rects){
-      sk.push();
-      sk.translate(x, y);
-      sk.scale(w, h);
-      sk.rect(0, 0, 1, 1);
-      sk.pop();
-    }
+    for(const wall of walls) wall.draw(sk);
 
     // drawRect(groundColliderDesc, {});
     sk.pop();
