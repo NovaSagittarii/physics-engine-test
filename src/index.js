@@ -69,6 +69,7 @@ const P5 = new p5((sk) => {
   sk.setup = () => {
     sk.createCanvas(400, 400);
     sk.frameRate(30);
+    console.log(sk);
   };
   sk.mousePressed = () => {
     // console.log(rigidBody);
@@ -85,7 +86,12 @@ const P5 = new p5((sk) => {
     sk.scale(1, -1);
     sk.translate(20, -35);
 
+    let screenX = mouseX, screenY = mouseY;
+    screenX /= 10; screenY /= -10;
+    screenX -= 20; screenY -= -35; // more like coordinates within the physics engine
+    
     sk.background(220);
+
     // sk.ellipse(mouseX, mouseY, 20, 20);
     sk.rectMode(CENTER, CENTER);
     sk.noStroke();
@@ -126,7 +132,7 @@ let ii = 0;
 let gameLoop = () => {
   if(!mutex) return;
   mutex = false;
-  if(physicsPerformance.read() < 16){
+  if(physicsPerformance.read() < 16 && balls.length < 10){
     balls.push(createBall( (((ii ++)%21)-10)*0.2, 20, 0.2 ));
     ballCountDiv.innerText = ii;
   }
