@@ -2,8 +2,7 @@ import RAPIER from '@dimforge/rapier2d-compat';
 import * as p5 from 'p5';
 import PerformanceIndictor from './PerformanceIndicator';
 
-import Ball from './lib/Ball';
-import Wall from './lib/Wall';
+import { Ball, Wall, Sensor } from './lib';
 
 const performanceDiv = document.querySelector('#performance');
 const ballCountDiv = document.createElement('div'); performanceDiv.append(ballCountDiv);
@@ -39,33 +38,39 @@ let ball = new Ball(world, 0, 1, 0.5);
 let balls = [...new Array(0)].map((_, i, {length}) => {
   return new Ball(world, ((i%11)-5)*1 +0.1, 0.2*i+5, i/length*0+0.2);
 });
+
+const sensors = [];
 // console.log(balls);
 let mutex = true;
 
+let screenX, screenY;
 // renderer
 const P5 = new p5((sk) => {
   let mouseclickpush = 50;
   sk.setup = () => {
     sk.createCanvas(400, 400);
-    sk.frameRate(30);
-    console.log(sk);
+    sk.frameRate(60);
+    // console.log(sk);
   };
   sk.mousePressed = () => {
     // console.log(rigidBody);
-    ball.rigidBody.applyImpulse(new RAPIER.Vector2(mouseclickpush *= -1, -5), true);
+    // ball.rigidBody.applyImpulse(new RAPIER.Vector2(mouseclickpush *= -1, -5), true);
+    sensors.push(new Sensor(world, screenX, screenY, 1, (other) => {
+      console.log(other);
+    }))
   };
   sk.draw = () => {
     if(!mutex) return;
     mutex = false;
 
     const currentTime = performance.now();
-    const { mouseX, mouseY, CENTER } = sk;
     sk.push();
     sk.scale(10);
     sk.scale(1, -1);
     sk.translate(20, -35);
 
-    let screenX = mouseX, screenY = mouseY;
+    const { mouseX, mouseY, CENTER } = sk;
+    screenX = mouseX, screenY = mouseY;
     screenX /= 10; screenY /= -10;
     screenX -= 20; screenY -= -35; // more like coordinates within the physics engine
     
@@ -78,6 +83,7 @@ const P5 = new p5((sk) => {
     ball.draw(sk);
     for(const ball of balls) ball.draw(sk);
     for(const wall of walls) wall.draw(sk);
+    for(const sensor of sensors) sensor.draw(sk);
 
     // drawRect(groundColliderDesc, {});
     sk.pop();
