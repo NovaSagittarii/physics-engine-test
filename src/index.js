@@ -9,7 +9,7 @@ const renderPerformance = new PerformanceIndictor(performanceDiv, 'render', 100)
 
 await RAPIER.init();
 
-let gravity = { x: 0.0, y: -9.81 };
+let gravity = { x: 0.0, y: -9.81*0 };
 let world = new RAPIER.World(gravity);
 
 // Ground
@@ -23,8 +23,9 @@ let rects = [
   // {x: 10, y: 5, w: 1, h: 10},
 
   {x: 0, y: -5, w: 100, h: 1}, // outer container
-  {x: -20, y: 10, w:1, h: 40},
-  {x: 20, y: 10, w:1, h: 40},
+  {x: -20, y: 10, w:1, h: 50},
+  {x: 20, y: 10, w:1, h: 50},
+  {x: 0, y: 35, w: 100, h: 1}, // lid
 ].map(a => {
   const {x, y, w, h} = a;
   world.createCollider(
