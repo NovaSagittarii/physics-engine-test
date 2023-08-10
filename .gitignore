@@ -1,0 +1,5 @@
+# node
+node_modules/
+
+# webpack
+dist/main.js
