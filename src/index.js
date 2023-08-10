@@ -118,7 +118,7 @@ let gameLoop = () => {
   if(!mutex) return;
   mutex = false;
   if(physicsPerformance.read() < 16 && balls.length < 10){
-    balls.push(new Ball(world, (((ii ++)%21)-10)*0.2, 20, 0.2 ));
+    balls.push(new Ball(world, (((ii ++)%21)-10)*0.2, 20, 0.5 ));
     ballCountDiv.innerText = ii;
   }
 
@@ -142,6 +142,7 @@ let gameLoop = () => {
 
     const J = Math.max(0, 10 - Math.hypot(v.x, v.y) * Math.cos( angleDifference(Jtheta, vtheta) )) * ball.rigidBody.mass();
     ball.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(Jtheta), J*Math.sin(Jtheta)), true);
+    // ball.rigidBody.setRotation(Jtheta);
   }else{
     ball.freeze();
   }
