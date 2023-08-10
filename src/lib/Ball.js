@@ -20,4 +20,10 @@ export default class Ball {
     sk.ellipse(0, 0, 1, 1);
     sk.pop();
   }
+  getX(){
+    return this.rigidBody.translation().x;
+  }
+  getY(){
+    return this.rigidBody.translation().y;
+  }
 }

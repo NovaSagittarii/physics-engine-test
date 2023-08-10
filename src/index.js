@@ -115,6 +115,17 @@ let gameLoop = () => {
   }
 
   const currentTime = performance.now();
+
+  // attract ball towards the sensors
+  if(sensors.length > 0){
+    const sensor = sensors[0];
+    const F = 1;
+    const theta = Math.atan2(sensor.getY() - ball.getY(), sensor.getX() - ball.getX());
+    ball.rigidBody.applyImpulse(new RAPIER.Vector2(F*Math.cos(theta), F*Math.sin(theta)), true);
+  }else{
+
+  }
+
   world.step(eventQueue);
   eventQueue.drainCollisionEvents((handle1, handle2, started) => {
     // console.log(handle1, handle2, started);

@@ -23,6 +23,8 @@ export default class Sensor extends DisposableEntity {
     this.y = y;
     this.collider.setTranslation(x, y);
   }
+  getX(){ return this.x; }
+  getY(){ return this.y; }
   draw(sk){
     const { x, y, radius } = this;
     sk.fill('#00000030');
