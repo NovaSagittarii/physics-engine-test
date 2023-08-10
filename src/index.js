@@ -2,6 +2,8 @@ import RAPIER from '@dimforge/rapier2d-compat';
 import * as p5 from 'p5';
 import PerformanceIndictor from './PerformanceIndicator';
 
+import Ball from './lib/Ball';
+
 const performanceDiv = document.querySelector('#performance');
 const ballCountDiv = document.createElement('div'); performanceDiv.append(ballCountDiv);
 const physicsPerformance = new PerformanceIndictor(performanceDiv, 'physics', 100);
@@ -35,31 +37,10 @@ let rects = [
   return a;
 });
 
-// Create a dynamic rigid-body.
-let rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
-.setTranslation(0.0, 1.0)
-.setCcdEnabled(true);
-let rigidBody = world.createRigidBody(rigidBodyDesc);
-
-// Create a cuboid collider attached to the dynamic rigidBody.
-let colliderDesc = RAPIER.ColliderDesc.ball(0.5);
-let collider = world.createCollider(colliderDesc, rigidBody);
-
-function createBall(x, y, radius){
-  let rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
-  .setTranslation(x, y)
-  .setLinearDamping(1.0)
-  // .setCcdEnabled(true);
-  let rigidBody = world.createRigidBody(rigidBodyDesc);
-  let colliderDesc = RAPIER.ColliderDesc.ball(radius);
-  let collider = world.createCollider(colliderDesc, rigidBody);
-  return {
-    colliderDesc, rigidBody
-  };
-}
-
+// ball is controllable, balls are environment
+let ball = new Ball(world, 0, 1, 0.5);
 let balls = [...new Array(0)].map((_, i, {length}) => {
-  return createBall(((i%11)-5)*1 +0.1, 0.2*i+5, i/length*0+0.2);
+  return new Ball(world, ((i%11)-5)*1 +0.1, 0.2*i+5, i/length*0+0.2);
 });
 // console.log(balls);
 let mutex = true;
@@ -74,7 +55,7 @@ const P5 = new p5((sk) => {
   };
   sk.mousePressed = () => {
     // console.log(rigidBody);
-    rigidBody.applyImpulse(new RAPIER.Vector2(mouseclickpush *= -1, -5), true);
+    ball.rigidBody.applyImpulse(new RAPIER.Vector2(mouseclickpush *= -1, -5), true);
   };
   sk.draw = () => {
     if(!mutex) return;
@@ -109,8 +90,8 @@ const P5 = new p5((sk) => {
     };
     // sk.rect(rigidBody.translation().x, rigidBody.translation().y, colliderDesc.shape(), 1);
     
-    drawRect(colliderDesc, rigidBody);
-    for(const {colliderDesc, rigidBody} of balls) drawRect(colliderDesc, rigidBody);
+    ball.draw(sk);
+    for(const ball of balls) ball.draw(sk);
     
     for(const {x, y, w, h} of rects){
       sk.push();
@@ -134,7 +115,7 @@ let gameLoop = () => {
   if(!mutex) return;
   mutex = false;
   if(physicsPerformance.read() < 16 && balls.length < 10){
-    balls.push(createBall( (((ii ++)%21)-10)*0.2, 20, 0.2 ));
+    balls.push(new Ball(world, (((ii ++)%21)-10)*0.2, 20, 0.2 ));
     ballCountDiv.innerText = ii;
   }
 
