@@ -94,7 +94,7 @@ const P5 = new p5((sk) => {
       ping.draw(sk);
       ping.step();
     }
-    filter(pings, (x) => x.alive);
+    for(const array of [sensors, pings]) filter(array, (x) => x.alive);
 
     // drawRect(groundColliderDesc, {});
     sk.pop();
@@ -124,6 +124,7 @@ let gameLoop = () => {
         if(activeColliders[h]){
           const o = activeColliders[h];
           pings.push(new Ping(o.x, o.y, 1, 30));
+          o.dispose();
         }
       }
     }

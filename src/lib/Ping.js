@@ -1,6 +1,8 @@
-export default class Ping {
+import DisposableEntity from "./DisposableEntity";
+
+export default class Ping extends DisposableEntity {
   constructor(x, y, radius, lifetime){
-    this.alive = true;
+    super();
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -15,6 +17,6 @@ export default class Ping {
   }
   step(){
     this.time --;
-    if(this.time <= 0) this.alive = false;
+    if(this.time <= 0) this.dispose();
   }
 }

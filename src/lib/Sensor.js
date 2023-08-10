@@ -1,7 +1,9 @@
 import RAPIER from '@dimforge/rapier2d-compat';
+import DisposableEntity from './DisposableEntity';
 
-export default class Sensor {
+export default class Sensor extends DisposableEntity {
   constructor(world, x, y, radius, callback){
+    super();
     this.attachments = [];
     this.world = world;
     this.x = x;
@@ -29,6 +31,7 @@ export default class Sensor {
     sk.ellipse(x, y, radius*2, radius*2);
   }
   dispose(){
+    super.dispose();
     for(const dictionary of this.attachments) delete dictionary[this.collider.handle];
     this.world.removeCollider(this.collider);
   }
