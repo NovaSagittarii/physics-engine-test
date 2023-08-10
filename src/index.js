@@ -83,6 +83,14 @@ const P5 = new p5((sk) => {
     sk.background(220);
 
     // sk.ellipse(mouseX, mouseY, 20, 20);
+    sk.stroke(255,0,0);
+    sk.strokeWeight(0.1);
+    for(let i = 0; i < sensors.length; i ++){
+      const sensor = sensors[i];
+      const { x, y } = i-1 >= 0 ? sensors[i-1] : ball.getTranslation();
+      sk.line(x, y, sensor.x, sensor.y);
+    }
+
     sk.rectMode(CENTER, CENTER);
     sk.noStroke();
     sk.fill('#000000');
