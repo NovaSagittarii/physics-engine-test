@@ -3,7 +3,7 @@ import * as p5 from 'p5';
 import PerformanceIndictor from './PerformanceIndicator';
 
 import { Ball, Wall, Sensor, Ping } from './lib';
-import { filter } from './lib/util';
+import { angleDifference, filter } from './lib/util';
 
 const performanceDiv = document.querySelector('#performance');
 const ballCountDiv = document.createElement('div'); performanceDiv.append(ballCountDiv);
@@ -118,16 +118,24 @@ let gameLoop = () => {
 
   // attract ball towards the sensors
   if(sensors.length > 0){
-    const sensor = sensors[0];
-    const J = 1;
     const { x, y } = ball.getTranslation();
-    const theta = Math.atan2(sensor.getY() - y, sensor.getX() - x);
-    ball.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(theta), J*Math.sin(theta)), true);
+    const sensor = sensors[0];
+    const Jtheta = Math.atan2(sensor.getY() - y, sensor.getX() - x); // direction of the impulse
+
+    // const Junit = [Math.cos(Jtheta), Math.sin(Jtheta)];
+
+    const v = ball.getVelocity();
+    const vtheta = Math.atan2(v.y, v.x); // direction of current motion
+    
+    const v1 = Math.hypot(v.x, v.y) * Math.cos(angleDifference(Jtheta, vtheta));
+    // const projection = [v1 * Math.cos(Jtheta), v1*Math.sin(Jtheta)];
+    // const rejection = [v.x - v1 * Math.cos(Jtheta), v.y - v1*Math.sin(Jtheta)];
+    ball.rigidBody.applyImpulse(new RAPIER.Vector2(-(v.x - v1 * Math.cos(Jtheta)), -(v.y - v1*Math.sin(Jtheta))));
+
+    const J = Math.max(0, 10 - Math.hypot(v.x, v.y) * Math.cos( angleDifference(Jtheta, vtheta) )) * ball.rigidBody.mass();
+    ball.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(Jtheta), J*Math.sin(Jtheta)), true);
   }else{
-    const { x, y } = ball.getVelocity();
-    const J = -Math.hypot(x, y) * ball.rigidBody.mass();
-    const theta = Math.atan2(y, x);
-    ball.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(theta), J*Math.sin(theta)), true);
+    ball.freeze();
   }
 
   world.step(eventQueue);

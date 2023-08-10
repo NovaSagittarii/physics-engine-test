@@ -27,4 +27,10 @@ export default class Ball {
   getVelocity(){
     return this.rigidBody.linvel();
   }
+  freeze(){
+    const { x, y } = this.getVelocity();
+    const J = -Math.hypot(x, y) * this.rigidBody.mass();
+    const theta = Math.atan2(y, x);
+    this.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(theta), J*Math.sin(theta)), true);
+  }
 }
