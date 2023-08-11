@@ -1,19 +1,11 @@
 import RAPIER from '@dimforge/rapier2d-compat';
 
-export default class Ball {
+export class BallBase {
   constructor(world, x, y, radius){
     this.world = world;
+    this.x = x;
+    this.y = y;
     this.radius = radius;
-    const rigidBodyDesc = this.rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
-    .setTranslation(x, y)
-    // .setLinearDamping(1.0)
-    // .setAngularDamping(1.0)
-    // .setCcdEnabled(true);
-    const rigidBody = this.rigidBody = world.createRigidBody(rigidBodyDesc);
-    const colliderDesc = this.colliderDesc = RAPIER.ColliderDesc.ball(radius, radius)
-      .setFriction(0.5)
-      .setRestitution(1.0);
-    this.collider = world.createCollider(colliderDesc, rigidBody);
   }
   draw(sk){
     const { x = 0, y = 0 } = (this.rigidBody?.translation && this.rigidBody.translation()) || {};
@@ -45,5 +37,21 @@ export default class Ball {
     const J = -Math.hypot(x, y) * this.rigidBody.mass();
     const theta = Math.atan2(y, x);
     this.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(theta), J*Math.sin(theta)), true);
+  }
+}
+
+export default class Ball extends BallBase {
+  constructor(world, x, y, radius){
+    super(world, x, y, radius);
+    const rigidBodyDesc = this.rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
+    .setTranslation(x, y)
+    // .setLinearDamping(1.0)
+    // .setAngularDamping(1.0)
+    // .setCcdEnabled(true);
+    const rigidBody = this.rigidBody = world.createRigidBody(rigidBodyDesc);
+    const colliderDesc = this.colliderDesc = RAPIER.ColliderDesc.ball(radius, radius)
+      .setFriction(0.5)
+      .setRestitution(1.0);
+    this.collider = world.createCollider(colliderDesc, rigidBody);
   }
 }

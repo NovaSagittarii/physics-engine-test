@@ -2,7 +2,7 @@ import RAPIER from '@dimforge/rapier2d-compat';
 import * as p5 from 'p5';
 import PerformanceIndictor from './PerformanceIndicator';
 
-import { Ball, Wall, Sensor, Ping } from './lib';
+import { Ball, Wall, Sensor, Ping, KinematicBall } from './lib';
 import { angleDifference, filter } from './lib/util';
 import PingRay from './lib/PingRay';
 
@@ -38,7 +38,7 @@ let walls = [
 });
 
 // ball is controllable, balls are environment
-let ball = new Ball(world, 0, 1, 0.5);
+let ball = new KinematicBall(world, 0, 1, 0.5);
 let balls = [...new Array(0)].map((_, i, {length}) => {
   return new Ball(world, ((i%11)-5)*1 +0.1, 0.2*i+5, i/length*0+0.2);
 });
@@ -143,26 +143,14 @@ let gameLoop = () => {
 
   // attract ball towards the sensors
   if(sensors.length > 0){
-    const { x, y } = ball.getTranslation();
     const sensor = sensors[0];
-    const Jtheta = Math.atan2(sensor.getY() - y, sensor.getX() - x); // direction of the impulse
-
-    // const Junit = [Math.cos(Jtheta), Math.sin(Jtheta)];
-
-    const v = ball.getVelocity();
-    const vtheta = Math.atan2(v.y, v.x); // direction of current motion
-    
-    const v1 = Math.hypot(v.x, v.y) * Math.cos(angleDifference(Jtheta, vtheta));
-    // const projection = [v1 * Math.cos(Jtheta), v1*Math.sin(Jtheta)];
-    // const rejection = [v.x - v1 * Math.cos(Jtheta), v.y - v1*Math.sin(Jtheta)];
-    ball.rigidBody.applyImpulse(new RAPIER.Vector2(-(v.x - v1 * Math.cos(Jtheta)), -(v.y - v1*Math.sin(Jtheta))));
-
-    const J = Math.max(0, 10 - Math.hypot(v.x, v.y) * Math.cos( angleDifference(Jtheta, vtheta) )) * ball.rigidBody.mass();
-    ball.rigidBody.applyImpulse(new RAPIER.Vector2(J*Math.cos(Jtheta), J*Math.sin(Jtheta)), true);
-    // ball.rigidBody.setRotation(Jtheta);
+    const { x, y } = sensor;
+    ball.goTo(x, y);
+    ball.step();
   }else{
     ball.freeze();
   }
+  // console.log(ball.rigidBody.linvel());
 
   world.step(eventQueue);
   eventQueue.drainCollisionEvents((handle1, handle2, started) => {
