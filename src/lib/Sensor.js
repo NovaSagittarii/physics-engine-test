@@ -15,6 +15,7 @@ export default class Sensor extends DisposableEntity {
       .setTranslation(x, y)
       .setSensor(true)
       .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS)
+      .setActiveCollisionTypes(RAPIER.ActiveCollisionTypes.ALL)
     );
     // world.intersectionsWith(this.collider, callback);
   }
