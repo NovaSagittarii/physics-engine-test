@@ -61,11 +61,14 @@ const P5 = new p5((sk) => {
   sk.mousePressed = () => {
     // console.log(rigidBody);
     // ball.rigidBody.applyImpulse(new RAPIER.Vector2(mouseclickpush *= -1, -5), true);
-    const sensor = new Sensor(world, screenX, screenY, 1, (other) => {
-      console.log(other);
-    });
-    sensor.attachCollider(activeColliders);
-    sensors.push(sensor);
+    ball.goTo(screenX, screenY);
+    // pings.push(new Ping(screenX, screenY, 1, 200));
+    // pings.push(new PingRay(ball.initialX, ball.initialY, ball.goalX, ball.goalY, 50));
+    // const sensor = new Sensor(world, screenX, screenY, 1, (other) => {
+    //   console.log(other);
+    // });
+    // sensor.attachCollider(activeColliders);
+    // sensors.push(sensor);
   };
   sk.draw = () => {
     if(!mutex) return;
@@ -141,15 +144,7 @@ let gameLoop = () => {
 
   const currentTime = performance.now();
 
-  // attract ball towards the sensors
-  if(sensors.length > 0){
-    const sensor = sensors[0];
-    const { x, y } = sensor;
-    ball.goTo(x, y);
-    ball.step();
-  }else{
-    ball.freeze();
-  }
+  ball.step();
   // console.log(ball.rigidBody.linvel());
 
   world.step(eventQueue);

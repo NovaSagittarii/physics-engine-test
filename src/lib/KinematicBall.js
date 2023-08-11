@@ -18,7 +18,13 @@ export default class KinematicBall extends BallBase {
     this.initialX = this.goalX = x;
     this.initialY = this.goalY = y;
   }
-
+  draw(sk){
+    sk.strokeWeight(0.1);
+    sk.stroke(100, 0, 0, 255);
+    const { x, y } = this.getTranslation();
+    sk.line(x, y, this.goalX, this.goalY);
+    super.draw(sk);
+  }
   goTo(x, y){
     if(this.goalX !== x || this.goalY !== y){
       this.initialX = this.getTranslation().x;

@@ -11,6 +11,7 @@ export default class Wall {
       RAPIER.ColliderDesc.cuboid(w/2, h/2)
       .setTranslation(x, y)
       .setRestitution(1)
+      .setActiveCollisionTypes(RAPIER.ActiveCollisionTypes.ALL)
     );
   }
   draw(sk){
