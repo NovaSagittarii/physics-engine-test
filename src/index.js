@@ -108,7 +108,7 @@ const P5 = new p5((sk) => {
       x += Math.cos(theta) * ball.radius *1.2;
       y += Math.sin(theta) * ball.radius *1.2;
       const ray = new RAPIER.Ray({ x, y }, { x: Math.cos(theta), y: Math.sin(theta) });
-      const maxToi = 100.0;
+      const maxToi = 4.0;
       const solid = true;
       const hit = world.castRay(ray, maxToi, solid);
       if(hit !== null){
