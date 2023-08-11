@@ -5,7 +5,7 @@ import { Vector2FromPolar } from "./util";
 export default class KinematicBall extends BallBase {
   constructor(world, x, y, radius){
     super(world, x, y, radius);
-    const rigidBodyDesc = this.rigidBodyDesc = RAPIER.RigidBodyDesc.kinematicVelocityBased()
+    const rigidBodyDesc = this.rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
     .setTranslation(x, y)
     // .setLinearDamping(1.0)
     // .setAngularDamping(1.0)
@@ -24,6 +24,8 @@ export default class KinematicBall extends BallBase {
     const { x, y } = this.getTranslation();
     sk.line(x, y, this.goalX, this.goalY);
     super.draw(sk);
+    sk.fill(100, 0, 0);
+    sk.ellipse(x, y, 1, 1);
   }
   goTo(x, y){
     if(this.goalX !== x || this.goalY !== y){
