@@ -1,6 +1,6 @@
 import RAPIER, { Vector2 } from "@dimforge/rapier2d-compat";
 import { BallBase } from "./Ball";
-import { Vector2FromPolar } from "./util";
+import { Vector2Angle, Vector2FromPolar, Vector2Magnitude, Vector2Subtract } from "./util";
 
 export default class KinematicBall extends BallBase {
   constructor(world, x, y, radius){
@@ -22,10 +22,10 @@ export default class KinematicBall extends BallBase {
     sk.strokeWeight(0.1);
     sk.stroke(100, 0, 0, 255);
     const { x, y } = this.getTranslation();
-    sk.line(x, y, this.goalX, this.goalY);
-    super.draw(sk);
     sk.fill(100, 0, 0);
     sk.ellipse(x, y, 1, 1);
+    sk.line(x, y, this.goalX, this.goalY);
+    super.draw(sk);
   }
   goTo(x, y){
     if(this.goalX !== x || this.goalY !== y){
@@ -41,7 +41,14 @@ export default class KinematicBall extends BallBase {
     const terminalDist = Math.hypot(x-this.goalX, y-this.goalY);
     const velocity = Math.max(0.1, Math.min(1, sourceDist, terminalDist))*10;
     const theta = Math.atan2(this.goalY-y, this.goalX-x);
-    this.rigidBody.setLinvel(Vector2FromPolar(velocity, theta));
+    // this.rigidBody.setLinvel(Vector2FromPolar(velocity, theta));
+    const goalLinvel = Vector2FromPolar(velocity, theta);
+    const maxImpulse = this.rigidBody.mass()*1;
+    const currentLinvel = this.rigidBody.linvel();
+    const reqLinvel = Vector2Subtract(goalLinvel, currentLinvel);
+    const reqLinvelTheta = Vector2Angle(reqLinvel);
+    const reqLinvelMagnitude = Vector2Magnitude(reqLinvel);
+    this.rigidBody.applyImpulse(Vector2FromPolar(Math.min(maxImpulse, reqLinvelMagnitude),  reqLinvelTheta));
   }
   freeze(){
     this.rigidBody.setLinvel(Vector2FromPolar(0, 0));

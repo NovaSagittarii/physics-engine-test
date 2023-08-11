@@ -17,3 +17,12 @@ export function angleDifference(a1, a2){
 export function Vector2FromPolar(r, theta){
   return new RAPIER.Vector2(r*Math.cos(theta), r*Math.sin(theta));
 }
+export function Vector2Subtract(a, b){
+  return new RAPIER.Vector2(a.x - b.x, a.y - b.y);
+}
+export function Vector2Angle(a){
+  return Math.atan2(a.y, a.x);
+}
+export function Vector2Magnitude(a){
+  return Math.hypot(a.x, a.y);
+}
